@@ -1,0 +1,55 @@
+From cfeb264a45b26f597e64f23843acfbeb7c9e72b5 Mon Sep 17 00:00:00 2001
+From: Amaury Lavieille <amaury.lavieille@businessdecision.com>
+Date: Wed, 25 May 2016 13:51:12 +0200
+Subject: [PATCH] fix node version voter
+
+---
+ Backoffice/Security/Authorization/Voter/NodeVersionVoter.php     | 9 +++++++--
+ .../Tests/Security/Authorization/Voter/NodeVersionVoterTest.php  | 6 +++++-
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/Backoffice/Security/Authorization/Voter/NodeVersionVoter.php b/Backoffice/Security/Authorization/Voter/NodeVersionVoter.php
+index c241b96..7343751 100644
+--- a/Backoffice/Security/Authorization/Voter/NodeVersionVoter.php
++++ b/Backoffice/Security/Authorization/Voter/NodeVersionVoter.php
+@@ -4,6 +4,7 @@
+ 
+ use OpenOrchestra\ModelInterface\Model\NodeInterface;
+ use OpenOrchestra\ModelInterface\Repository\NodeRepositoryInterface;
++use OpenOrchestra\UserBundle\Model\UserInterface;
+ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+ 
+@@ -32,8 +33,12 @@ public function __construct(NodeRepositoryInterface $repository)
+     public function supportsAttribute($attribute)
+     {
+         return 0 === strpos($attribute, 'ROLE_') &&
+-               false === strpos($attribute, 'ROLE_ACCESS_TREE_NODE') &&
+-               false === strpos($attribute, 'ROLE_ACCESS_ERROR_NODE');
++               false === strpos($attribute, 'ROLE_ACCESS_MOVE_TREE') &&
++               false === strpos($attribute, 'ROLE_ACCESS_CREATE_NODE') &&
++               false === strpos($attribute, 'ROLE_ACCESS_DELETE_NODE') &&
++               false === strpos($attribute, 'ROLE_ACCESS_ERROR_NODE') &&
++               false === strpos($attribute, 'ROLE_ACCESS_CREATE_ERROR_NODE') &&
++               false === strpos($attribute, 'ROLE_ACCESS_TREE_NODE');
+     }
+ 
+     /**
+diff --git a/Backoffice/Tests/Security/Authorization/Voter/NodeVersionVoterTest.php b/Backoffice/Tests/Security/Authorization/Voter/NodeVersionVoterTest.php
+index efd2645..eb51982 100644
+--- a/Backoffice/Tests/Security/Authorization/Voter/NodeVersionVoterTest.php
++++ b/Backoffice/Tests/Security/Authorization/Voter/NodeVersionVoterTest.php
+@@ -64,8 +64,12 @@ public function provideRoleAndSupports()
+         return array(
+             array(true, 'ROLE_USER'),
+             array(true, 'ROLE_ACCESS'),
+-            array(false, 'ROLE_ACCESS_TREE_NODE'),
++            array(false, 'ROLE_ACCESS_MOVE_TREE'),
++            array(false, 'ROLE_ACCESS_DELETE_NODE'),
++            array(false, 'ROLE_ACCESS_CREATE_NODE'),
+             array(false, 'ROLE_ACCESS_ERROR_NODE'),
++            array(false, 'ROLE_ACCESS_CREATE_ERROR_NODE'),
++            array(false, 'ROLE_ACCESS_TREE_NODE'),
+             array(false, '24051'),
+             array(false, 'foo'),
+         );
