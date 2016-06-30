@@ -1,0 +1,19 @@
+oo_code:
+    build: code
+    volumes:
+        - ../:/var/www/oo-backoffice
+    tty: true
+
+oo_mongo:
+  image: mongo:3.0
+  ports:
+    - 27017:27017
+
+oo_apache_php:
+    build: apache_php
+    ports:
+        - 80:80
+    links:
+        - oo_mongo
+    volumes_from:
+        - oo_code
