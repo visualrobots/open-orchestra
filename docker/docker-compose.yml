@@ -1,7 +1,9 @@
 oo_code:
     build: code
     volumes:
-        - ../:/var/www/oo-backoffice
+        - ../:/var/www/openorchestra
+        - ../../open-orchestra-front-demo/:/var/www/front-openorchestra
+        - ../../open-orchestra-media-demo/:/var/www/media-openorchestra
     tty: true
 
 oo_mongo:
@@ -10,10 +12,16 @@ oo_mongo:
     - 27017:27017
 
 oo_apache_php:
-    build: apache_php
+    build: apache-php
     ports:
         - 80:80
     links:
         - oo_mongo
+        - oo_elasticsearch
     volumes_from:
         - oo_code
+
+oo_elasticsearch:
+    image: elasticsearch
+    ports:
+        - 9200:9200
