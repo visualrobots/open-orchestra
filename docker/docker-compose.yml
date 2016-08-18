@@ -1,5 +1,5 @@
 oo_code:
-    build: code
+    image: debian:jessie
     volumes:
         - ../:/var/www/openorchestra
         - ../../open-orchestra-front-demo/:/var/www/front-openorchestra
@@ -13,15 +13,28 @@ oo_mongo:
 
 oo_apache_php:
     build: apache-php
-    ports:
-        - 80:80
     links:
         - oo_mongo
         - oo_elasticsearch
     volumes_from:
         - oo_code
+    ports:
+      - 80:80
 
 oo_elasticsearch:
     image: elasticsearch
     ports:
         - 9200:9200
+
+oo_varnish:
+    image: million12/varnish
+    volumes:
+      - ./varnish/default.vcl:/etc/varnish/default.vcl
+    links:
+      - oo_apache_php
+    environment:
+      - VARNISHD_PARAMS=-a :6081
+    expose:
+      - 6081
+    ports:
+      - 6081:6081
