@@ -1,40 +1,54 @@
-oo_code:
-    image: debian:jessie
-    volumes:
-        - ../:/var/www/openorchestra
-        - ../../open-orchestra-front-demo/:/var/www/front-openorchestra
-        - ../../open-orchestra-media-demo/:/var/www/media-openorchestra
-    tty: true
+version: '2'
 
-oo_mongo:
-  image: mongo:3.0
-  ports:
-    - 27017:27017
+services:
+  oo_code:
+      image: debian:jessie
+      volumes:
+          - ../:/var/www/openorchestra
+          - ../../open-orchestra-front-demo/:/var/www/front-openorchestra
+          - ../../open-orchestra-media-demo/:/var/www/media-openorchestra
+          - ../../uploaded-files:/var/www/uploaded-files
+      tty: true
 
-oo_apache_php:
-    build: apache-php
-    links:
-        - oo_mongo
-        - oo_elasticsearch
-    volumes_from:
-        - oo_code
+  oo_mongo:
+    image: mongo:3.0
+    networks:
+        - db
     ports:
-      - 80:80
+      - 27017:27017
 
-oo_elasticsearch:
-    image: elasticsearch
-    ports:
-        - 9200:9200
+  oo_apache_php:
+      build: apache-php
+      networks:
+          - db
+          - els
+          - varnish
+      volumes_from:
+          - oo_code
+      ports:
+        - 80:80
 
-oo_varnish:
-    image: million12/varnish
-    volumes:
-      - ./varnish/default.vcl:/etc/varnish/default.vcl
-    links:
-      - oo_apache_php
-    environment:
-      - VARNISHD_PARAMS=-a :6081
-    expose:
-      - 6081
-    ports:
-      - 6081:6081
+  oo_elasticsearch:
+      image: elasticsearch
+      networks:
+          - els
+      ports:
+          - 9200:9200
+
+  oo_varnish:
+      image: million12/varnish
+      volumes:
+        - ./varnish/default.vcl:/etc/varnish/default.vcl
+      networks:
+          - varnish
+      environment:
+        - VARNISHD_PARAMS=-a :6081
+      expose:
+        - 6081
+      ports:
+        - 6081:6081
+
+networks:
+  db: {}
+  varnish: {}
+  els: {}

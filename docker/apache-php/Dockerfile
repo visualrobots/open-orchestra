@@ -24,9 +24,6 @@ RUN a2ensite media-openorchestra.conf
 
 RUN usermod -u 1000 www-data
 
-RUN mkdir /var/uploaded-files
-RUN chmod a+w /var/uploaded-files
-
 EXPOSE 80
 
 CMD /usr/sbin/apache2ctl -D FOREGROUND
