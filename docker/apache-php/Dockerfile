@@ -9,9 +9,11 @@ COPY ./vhosts/back-openorchestra.conf /etc/apache2/sites-available/back-openorch
 COPY ./vhosts/front-openorchestra.conf /etc/apache2/sites-available/front-openorchestra.conf
 COPY ./vhosts/media-openorchestra.conf /etc/apache2/sites-available/media-openorchestra.conf
 
-COPY mongo.ini /etc/php5/mods-available/
-COPY imagick.ini /etc/php5/mods-available/
-COPY symfony.ini /etc/php5/mods-available/
+COPY ./ini/mongo.ini /etc/php5/mods-available/
+COPY ./ini/imagick.ini /etc/php5/mods-available/
+COPY ./ini/symfony.ini /etc/php5/mods-available/
+
+COPY ./cron/openorchestra /etc/cron.d/
 
 RUN php5enmod mongo
 RUN php5enmod imagick
